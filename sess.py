@@ -1,9 +1,11 @@
-from flask import Flask, redirect, url_for, render_template, request, session
+from flask import Flask, redirect, url_for, render_template, request, session, make_response
 from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = "Hello_Ashish_thisismysecretkey"
 app.permanent_session_lifetime = timedelta(minutes=5)  # set lifetime of session
+
+
 
 @app.route('/')
 def home():
@@ -23,6 +25,9 @@ def login():
         if username == "ashish" and password == "ashish@1":  # validate username and password
             session['username'] = username  # create session and store username
             return redirect(url_for('user'))  # redirect to the user page
+        else:
+            return 'username or password not matched!'
+        
     else:
         if "username" in session:  # check if session data present or not
             return redirect(url_for('user'))  # redirect to the user page
@@ -33,8 +38,7 @@ def login():
 def user():
     if "username" in session:
         usr = session['username']
-        # logout = ""
-        return f"<h1> welcome {usr} </h1>"
+        return f"<h1> welcome {usr}</h1>"
     else:
         return redirect(url_for('login'))
 
