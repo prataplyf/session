@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, session, make_response
 from datetime import timedelta
+import random
 
 app = Flask(__name__)
 app.secret_key = "Hello_Ashish_thisismysecretkey"
@@ -22,8 +23,12 @@ def login():
         session.permanent = True  # setting session True which is valid for certain time
         username = request.form['username']
         password = request.form['password']
-        if username == "ashish" and password == "ashish@1":  # validate username and password
+        if password == "admin@1":  # validate username and password
             session['username'] = username  # create session and store username
+            session[username] = {'username':username, 'randomID': random.randint(0,10000)}
+            print(session)
+            print(session['username'])
+            print(session[username])
             return redirect(url_for('user'))  # redirect to the user page
         else:
             return 'username or password not matched!'
@@ -43,10 +48,24 @@ def user():
         return redirect(url_for('login'))
 
 # destoy session
-@app.route("/logout")
-def logout():
-    session.pop("username", None)
-    return redirect(url_for('login'))
+@app.route("/logout/<otp>")
+def logout(otp):
+    if "username" in session:
+        print(session)
+        usr = session['username']
+        print(usr)
+        print(session[usr])
+        print(session[usr]['randomID'])
+        print(otp)
+        if int(session[usr]['randomID']) != int(otp):
+            print("Wrong OTP")
+            return redirect(url_for('login'))
+        else:
+            session.pop(usr, None)
+            session.pop("username", None)
+            return redirect(url_for('login'))
+    else:
+        return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
